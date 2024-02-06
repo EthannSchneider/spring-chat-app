@@ -1,7 +1,6 @@
 package ch.shkermit.tpi.chatapp.security;
 
 import java.time.Instant;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,7 +17,6 @@ public class CustomJwtDecoder implements JwtDecoder {
 
         Map<String, Object> claims = new HashMap<>();
         claims.put("sub", "user");
-        claims.put("scope", Arrays.asList("read", "write"));
         
         Instant issuedAt = Instant.now().plusSeconds(0); 
         Instant expiresAt = Instant.now().plusSeconds(3600);
