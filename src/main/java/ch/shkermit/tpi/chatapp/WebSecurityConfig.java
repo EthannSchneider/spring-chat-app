@@ -13,6 +13,7 @@ import org.springframework.security.web.SecurityFilterChain;
 
 import ch.shkermit.tpi.chatapp.security.CustomBearerTokenResolver;
 import ch.shkermit.tpi.chatapp.security.CustomJwtDecoder;
+import ch.shkermit.tpi.chatapp.security.UserIdentityService;
 
 @Configuration
 @EnableWebSecurity
@@ -33,6 +34,11 @@ public class WebSecurityConfig {
                 return new CustomJwtDecoder();
         }
 
+        @Bean
+        UserIdentityService userIdentityService() {
+                return new UserIdentityService();
+        }
+
         @Configuration
         public class apiWebSecurityConfig {
                 @Bean
@@ -43,7 +49,7 @@ public class WebSecurityConfig {
                         .authorizeHttpRequests(authorizeRequest ->
                         authorizeRequest
                                 .requestMatchers("/api/auth/**").permitAll()
-                                .anyRequest().authenticated())
+                                .anyRequest().hasAuthority("user"))
                         .oauth2ResourceServer(oauth2 -> oauth2.bearerTokenResolver(bearerTokenResolver()).jwt(jwt -> jwt.decoder(jwtDecoder())));
                         return http.build();
                 }

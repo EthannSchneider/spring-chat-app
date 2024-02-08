@@ -16,7 +16,7 @@ public class CustomJwtDecoder implements JwtDecoder {
         headers.put("alg", "RS256");
 
         Map<String, Object> claims = new HashMap<>();
-        claims.put("sub", "user");
+        claims.put("sub", "User1");
         
         Instant issuedAt = Instant.now().plusSeconds(0); 
         Instant expiresAt = Instant.now().plusSeconds(3600);

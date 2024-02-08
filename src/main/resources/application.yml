@@ -1,0 +1,11 @@
+spring:
+  datasource:
+    driver-class-name: org.apache.derby.jdbc.EmbeddedDriver
+    url: "jdbc:derby:${user.home}/.chatapp-db;create=true"
+    hikari:
+      auto-commit: false
+  jpa:
+    hibernate:
+      ddl-auto: update
+  flyway:
+    enabled: false
