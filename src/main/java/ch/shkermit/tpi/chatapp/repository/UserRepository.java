@@ -8,4 +8,6 @@ import ch.shkermit.tpi.chatapp.model.User;
 
 public interface UserRepository extends CrudRepository<User, Long> {
     Optional<User> findByUsername(String username);
+
+    Optional<User> findByEmail(String email);
 }

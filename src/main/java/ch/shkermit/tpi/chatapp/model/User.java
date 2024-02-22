@@ -1,9 +1,9 @@
 package ch.shkermit.tpi.chatapp.model;
 
-import java.util.ArrayList;
 import java.util.Collection;
 
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import jakarta.persistence.Column;
@@ -11,34 +11,40 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
+@Table(name = "user_identity")
 public class User implements UserDetails {
     @Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@ToString.Exclude
 	private Long id;
 
-    @Column(unique = true)
+    @Column(unique = true, nullable = false)
     private String username;
 
-    @Column(unique = true)
+    @Column(unique = true, nullable = false)
     private String email;
 
-    @Column
+    @Column(nullable = false)
     @ToString.Exclude
     private String password;
 
-    @Column
-	private String name;
+    @Column(nullable = false)
+	private String firstName;
 	
-	@Column
+	@Column(nullable = false)
 	private String lastName;
 
-    @Column
+    @Column(nullable = false)
     private String phoneNumber;
 
     @Column
@@ -52,9 +58,7 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        Collection<GrantedAuthority> authorities = new ArrayList<>();
-        authorities.add(() -> "user");
-        return authorities;
+        return AuthorityUtils.createAuthorityList("USER");
     }
 
     @Override
