@@ -6,6 +6,8 @@ import ch.shkermit.tpi.chatapp.model.User;
 
 public interface UserService {
     public User getUser(String username) throws UsersNotExistException;
-    
+
+    public User getUser(String username, String password) throws UsersNotExistException;
+
     public User createUser(User user) throws UsersAlreadyExistException;
 }

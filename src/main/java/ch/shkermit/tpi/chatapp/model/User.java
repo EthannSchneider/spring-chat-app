@@ -4,7 +4,6 @@ import java.util.Collection;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -22,7 +21,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @Entity
 @Table(name = "user_identity")
-public class User implements UserDetails {
+public class User {
     @Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@ToString.Exclude
@@ -56,29 +55,7 @@ public class User implements UserDetails {
     @Column
     private String bannerPicture;
 
-    @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return AuthorityUtils.createAuthorityList("USER");
     }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true;
-    }
-
 }

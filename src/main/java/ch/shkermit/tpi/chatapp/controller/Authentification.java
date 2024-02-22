@@ -3,8 +3,10 @@ package ch.shkermit.tpi.chatapp.controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import ch.shkermit.tpi.chatapp.dto.LoginUserDTO;
 import ch.shkermit.tpi.chatapp.dto.RegisterUserDTO;
 import ch.shkermit.tpi.chatapp.exception.UsersException.UsersAlreadyExistException;
+import ch.shkermit.tpi.chatapp.exception.UsersException.UsersNotExistException;
 import ch.shkermit.tpi.chatapp.model.User;
 import ch.shkermit.tpi.chatapp.projection.TokenUserProjection;
 import ch.shkermit.tpi.chatapp.projection.UserProjection;
@@ -33,31 +35,38 @@ public class Authentification {
     private ProjectionFactory projectionFactory;
 
     @PostMapping("login")
-    public String login() {
-        return "Login";
+    public ResponseEntity<TokenUserProjection> login(@RequestBody LoginUserDTO userDTO) throws UsersNotExistException {
+        User user = userService.getUser(userDTO.getUsername(), userDTO.getPassword());
+
+        return ResponseEntity.ok().body(getTokenUserProjectionByUser(user));
     }
 
     @PostMapping("register")
-    public ResponseEntity<TokenUserProjection> register(@RequestBody RegisterUserDTO user) throws UsersAlreadyExistException {
+    public ResponseEntity<TokenUserProjection> register(@RequestBody RegisterUserDTO userDTO) throws UsersAlreadyExistException {
         User newUser = new User();
-        newUser.setUsername(user.getUsername());
-        newUser.setEmail(user.getEmail());
-        newUser.setPhoneNumber(user.getPhoneNumber());
-        newUser.setFirstName(user.getFirstName());
-        newUser.setLastName(user.getLastName());
-        newUser.setPassword(user.getPassword());
+        newUser.setUsername(userDTO.getUsername());
+        newUser.setEmail(userDTO.getEmail());
+        newUser.setPhoneNumber(userDTO.getPhoneNumber());
+        newUser.setFirstName(userDTO.getFirstName());
+        newUser.setLastName(userDTO.getLastName());
+        newUser.setPassword(userDTO.getPassword());
 
         userService.createUser(newUser);
 
-        String token = userSessionService.createSession(newUser);
-
-        UserProjection tokenUser = projectionFactory.createProjection(UserProjection.class, newUser);
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(new TokenUserProjection(token, tokenUser));
+        return ResponseEntity.status(HttpStatus.CREATED).body(getTokenUserProjectionByUser(newUser));
     }
 
     @GetMapping("logout")
     public String logout() {
         return "Logout";
+    }
+
+    @SuppressWarnings("null")
+    private TokenUserProjection getTokenUserProjectionByUser(User user) {
+        String token = userSessionService.createSession(user);
+
+        UserProjection userProjection = projectionFactory.createProjection(UserProjection.class, user);
+
+        return new TokenUserProjection(token, userProjection);
     }
 }

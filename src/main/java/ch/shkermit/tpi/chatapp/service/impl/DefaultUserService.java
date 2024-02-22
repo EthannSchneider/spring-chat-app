@@ -20,6 +20,17 @@ public class DefaultUserService implements UserService {
     public User getUser(String username) throws UsersNotExistException {
         return userRepository.findByUsername(username).orElseThrow(UsersNotExistException::new);
     }
+
+    @Override
+    public User getUser(String username, String password) throws UsersNotExistException {
+        User user = userRepository.findByUsername(username).orElseThrow(UsersNotExistException::new);
+
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            throw new UsersNotExistException();
+        }
+
+        return user;
+    }
     
     @Override
     public User createUser(User user) throws UsersAlreadyExistException {
