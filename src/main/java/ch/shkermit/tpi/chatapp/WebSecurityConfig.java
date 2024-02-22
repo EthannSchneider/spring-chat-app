@@ -17,7 +17,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import ch.shkermit.tpi.chatapp.security.CustomAuthenticationManager;
 import ch.shkermit.tpi.chatapp.security.CustomBearerTokenResolver;
 import ch.shkermit.tpi.chatapp.security.CustomJwtDecoder;
-import ch.shkermit.tpi.chatapp.security.UserIdentityService;
 
 @Configuration
 @EnableWebSecurity
@@ -39,11 +38,6 @@ public class WebSecurityConfig {
         }
 
         @Bean
-        UserIdentityService userIdentityService() {
-                return new UserIdentityService();
-        }
-
-        @Bean
         AuthenticationManager authenticationManager() {
                 return new CustomAuthenticationManager();
         }
@@ -55,7 +49,6 @@ public class WebSecurityConfig {
                 SecurityFilterChain apiWebSecurity(HttpSecurity http) throws Exception {
                         http
                         .csrf(csrf -> csrf.disable())
-                        .userDetailsService(userIdentityService())
                         .authenticationManager(authenticationManager())
                         .authorizeHttpRequests(authorizeRequest ->
                                 authorizeRequest
