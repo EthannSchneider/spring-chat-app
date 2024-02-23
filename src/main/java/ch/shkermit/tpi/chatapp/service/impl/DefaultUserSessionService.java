@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import ch.shkermit.tpi.chatapp.exception.SessionException.SessionNotExistException;
 import ch.shkermit.tpi.chatapp.model.User;
 import ch.shkermit.tpi.chatapp.model.UserSession;
 import ch.shkermit.tpi.chatapp.repository.UserSessionRepository;
@@ -20,8 +21,8 @@ public class DefaultUserSessionService implements UserSessionService {
     private UserSessionRepository userSessionRepository;
 
     @Override
-    public UserSession getSession(String token) {
-        return userSessionRepository.findBySessionUUID(tokenService.decodeToken(token).getPayload().getSubject()).orElseThrow();
+    public UserSession getSession(String token) throws SessionNotExistException {
+        return userSessionRepository.findBySessionUUID(tokenService.decodeToken(token).getPayload().getSubject()).orElseThrow(SessionNotExistException::new);
     }
 
     @Override
@@ -38,7 +39,21 @@ public class DefaultUserSessionService implements UserSessionService {
     }
 
     @Override
-    public String getSessionToken(UserSession userSession) {
+    public String getSessionToken(UserSession userSession) throws SessionNotExistException {
+        isSessionExist(userSession);
         return tokenService.createToken(userSession.getSessionUUID());
+    }
+
+    @SuppressWarnings("null")
+    @Override
+    public void deleteSession(UserSession userSession) throws SessionNotExistException {
+        isSessionExist(userSession);
+        userSessionRepository.delete(userSession);
+    }
+
+    private void isSessionExist(UserSession userSession) throws SessionNotExistException {
+        if (userSessionRepository.findBySessionUUID(userSession.getSessionUUID()).isEmpty()) {
+            throw new SessionNotExistException();
+        }
     }
 }

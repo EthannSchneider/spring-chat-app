@@ -4,6 +4,7 @@ import java.util.Collection;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
@@ -18,27 +19,32 @@ public class CustomAuthenticationManager implements AuthenticationManager {
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         String token = authentication.getName();
-        UserSession session = userSessionService.getSession(token.split(" ")[1]);
+        UserSession session; 
+        try {
+            session = userSessionService.getSession(token.split(" ")[1]);
+        } catch (Exception e) {
+            throw new BadCredentialsException("Authentication Exception - Invalid Token");
+        }
 
-        Authentication newAuthentication = new CustomAuthentication(session.getUserInSession().getUsername(), session.getUserInSession().getAuthorities());
+        Authentication newAuthentication = new CustomAuthentication(session, session.getUserInSession().getAuthorities());
 
         return newAuthentication;
     }
 
     class CustomAuthentication implements Authentication {
-        private String name;
+        private UserSession principal;
         private boolean authenticated;
         private Collection<? extends GrantedAuthority> authorities;
 
-        public CustomAuthentication(String name, Collection<? extends GrantedAuthority> authorities) {
-            this.name = name;
+        public CustomAuthentication(UserSession userSession,  Collection<? extends GrantedAuthority> authorities) {
+            this.principal = userSession;
             this.authorities = authorities;
             this.authenticated = true;
         }
 
         @Override
         public String getName() {
-            return name;
+            return principal.getSessionUUID();
         }
 
         @Override
@@ -48,7 +54,7 @@ public class CustomAuthenticationManager implements AuthenticationManager {
 
         @Override
         public Object getPrincipal() {
-            return name;
+            return principal;
         }
 
         @Override

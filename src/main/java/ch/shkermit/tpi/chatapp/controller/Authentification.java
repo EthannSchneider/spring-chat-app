@@ -5,9 +5,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import ch.shkermit.tpi.chatapp.dto.LoginUserDTO;
 import ch.shkermit.tpi.chatapp.dto.RegisterUserDTO;
+import ch.shkermit.tpi.chatapp.exception.SessionException.SessionNotExistException;
 import ch.shkermit.tpi.chatapp.exception.UsersException.UsersAlreadyExistException;
 import ch.shkermit.tpi.chatapp.exception.UsersException.UsersNotExistException;
 import ch.shkermit.tpi.chatapp.model.User;
+import ch.shkermit.tpi.chatapp.model.UserSession;
 import ch.shkermit.tpi.chatapp.projection.TokenUserProjection;
 import ch.shkermit.tpi.chatapp.projection.UserProjection;
 import ch.shkermit.tpi.chatapp.service.UserService;
@@ -20,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.projection.ProjectionFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 
 @RestController
@@ -57,8 +60,10 @@ public class Authentification {
     }
 
     @GetMapping("logout")
-    public String logout() {
-        return "Logout";
+    public ResponseEntity<String> logout(@AuthenticationPrincipal UserSession userSession) throws SessionNotExistException {
+        userSessionService.deleteSession(userSession);
+
+        return ResponseEntity.ok().body("{\"message\": \"User logged out\"}");
     }
 
     @SuppressWarnings("null")
