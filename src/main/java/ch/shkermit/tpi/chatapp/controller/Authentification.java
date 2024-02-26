@@ -14,6 +14,7 @@ import ch.shkermit.tpi.chatapp.projection.TokenUserProjection;
 import ch.shkermit.tpi.chatapp.projection.UserProjection;
 import ch.shkermit.tpi.chatapp.service.UserService;
 import ch.shkermit.tpi.chatapp.service.UserSessionService;
+import jakarta.validation.Valid;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -38,14 +39,14 @@ public class Authentification {
     private ProjectionFactory projectionFactory;
 
     @PostMapping("login")
-    public ResponseEntity<TokenUserProjection> login(@RequestBody LoginUserDTO userDTO) throws UsersNotExistException {
+    public ResponseEntity<TokenUserProjection> login(@RequestBody @Valid LoginUserDTO userDTO) throws UsersNotExistException {
         User user = userService.getUser(userDTO.getUsername(), userDTO.getPassword());
 
         return ResponseEntity.ok().body(getTokenUserProjectionByUser(user));
     }
 
     @PostMapping("register")
-    public ResponseEntity<TokenUserProjection> register(@RequestBody RegisterUserDTO userDTO) throws UsersAlreadyExistException {
+    public ResponseEntity<TokenUserProjection> register(@RequestBody @Valid RegisterUserDTO userDTO) throws UsersAlreadyExistException {
         User newUser = new User();
         newUser.setUsername(userDTO.getUsername());
         newUser.setEmail(userDTO.getEmail());

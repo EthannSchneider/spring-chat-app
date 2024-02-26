@@ -41,4 +41,16 @@ public class DefaultUserService implements UserService {
 
         return userRepository.save(user);
     }
+
+    @Override
+    public User updateUser(User user) throws UsersNotExistException {
+        if (userRepository.findByEmail(user.getEmail()).isEmpty() || userRepository.findByUsername(user.getUsername()).isEmpty()) {
+            throw new UsersNotExistException();
+        }
+        if (user.getPassword().equals(getUser(user.getUsername()).getPassword())) {
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+        }
+
+        return userRepository.save(user);
+    }
 }

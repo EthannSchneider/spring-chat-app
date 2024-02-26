@@ -1,16 +1,13 @@
 package ch.shkermit.tpi.chatapp.dto;
 
-import org.springframework.validation.annotation.Validated;
-
+import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
-import lombok.NonNull;
 
-@Validated
 @Data
 public class LoginUserDTO {
-    @NonNull
+    @NotEmpty
     private String username;
 
-    @NonNull
+    @NotEmpty
     private String password;
 }

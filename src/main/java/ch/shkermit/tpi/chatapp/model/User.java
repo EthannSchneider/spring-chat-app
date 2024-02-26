@@ -33,21 +33,27 @@ public class User {
     @Column(unique = true, nullable = false)
     private String email;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 100)
     @ToString.Exclude
     private String password;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 50)
 	private String firstName;
 	
-	@Column(nullable = false)
+	@Column(nullable = false, length = 50)
 	private String lastName;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 15)
     private String phoneNumber;
 
-    @Column
-    private String description;
+    @Column(nullable = false, length = 500)
+    private String description = "";
+
+    @Column(nullable = false, length=10)
+    private String pronouns = "";
+
+    @Column(nullable = false, length=50)
+    private String displayName = "";
 
     @Column
     private String profilePicture;
