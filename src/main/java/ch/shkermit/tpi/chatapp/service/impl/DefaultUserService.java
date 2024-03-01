@@ -53,4 +53,9 @@ public class DefaultUserService implements UserService {
 
         return userRepository.save(user);
     }
+
+    @Override
+    public boolean isUserExist(String username) throws UsersNotExistException {
+        return userRepository.findByUsername(username).isPresent();
+    }
 }
