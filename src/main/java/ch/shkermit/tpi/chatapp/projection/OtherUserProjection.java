@@ -1,15 +1,7 @@
 package ch.shkermit.tpi.chatapp.projection;
 
-public interface UserProjection {
+public interface OtherUserProjection {
     String getUsername();
-
-    String getEmail();
-
-    String getPhoneNumber();
-
-    String getFirstName();
-
-    String getLastName();
 
     String getDisplayName();
 

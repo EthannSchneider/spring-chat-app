@@ -1,28 +1,32 @@
 package ch.shkermit.tpi.chatapp.dto;
 
-import org.springframework.validation.annotation.Validated;
-
+import ch.shkermit.tpi.chatapp.utils.RegexUtils;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
-import lombok.NonNull;
 
-@Validated
 @Data
 public class RegisterUserDTO {
-    @NonNull
+    @NotEmpty
     private String username;
 
-    @NonNull
+    @NotEmpty
+    @Pattern(regexp = RegexUtils.email)
     private String email;
 
-    @NonNull
+    @NotEmpty
+    @Pattern(regexp = RegexUtils.phonenumber)
     private String phoneNumber;
 
-    @NonNull
+    @NotEmpty
+    @Size(min = 2, max = 50)
     private String firstName;
 
-    @NonNull
+    @NotEmpty
+    @Size(min = 2, max = 50)
     private String lastName;
 
-    @NonNull
+    @NotEmpty
     private String password;
 }

@@ -10,4 +10,8 @@ public interface UserService {
     public User getUser(String username, String password) throws UsersNotExistException;
 
     public User createUser(User user) throws UsersAlreadyExistException;
+
+    public User updateUser(User user) throws UsersNotExistException;
+
+    public boolean isUserExist(String username);
 }

@@ -23,7 +23,7 @@ public class DefaultUserService implements UserService {
 
     @Override
     public User getUser(String username, String password) throws UsersNotExistException {
-        User user = userRepository.findByUsername(username).orElseThrow(UsersNotExistException::new);
+        User user = getUser(username);
 
         if (!passwordEncoder.matches(password, user.getPassword())) {
             throw new UsersNotExistException();
@@ -40,5 +40,22 @@ public class DefaultUserService implements UserService {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
         return userRepository.save(user);
+    }
+
+    @Override
+    public User updateUser(User user) throws UsersNotExistException {
+        if (userRepository.findByEmail(user.getEmail()).isEmpty() || userRepository.findByUsername(user.getUsername()).isEmpty()) {
+            throw new UsersNotExistException();
+        }
+        if (!user.getPassword().equals(getUser(user.getUsername()).getPassword())) {
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+        }
+
+        return userRepository.save(user);
+    }
+
+    @Override
+    public boolean isUserExist(String username) {
+        return userRepository.findByUsername(username).isPresent();
     }
 }

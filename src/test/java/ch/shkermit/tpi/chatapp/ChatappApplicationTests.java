@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @EnableAutoConfiguration
-@SpringBootTest
+@SpringBootTest(properties = "spring.profiles.active=test")
 class ChatappApplicationTests {
 
 	@Test
