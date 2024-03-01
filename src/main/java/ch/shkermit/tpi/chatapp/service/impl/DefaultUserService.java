@@ -55,7 +55,7 @@ public class DefaultUserService implements UserService {
     }
 
     @Override
-    public boolean isUserExist(String username) throws UsersNotExistException {
+    public boolean isUserExist(String username) {
         return userRepository.findByUsername(username).isPresent();
     }
 }

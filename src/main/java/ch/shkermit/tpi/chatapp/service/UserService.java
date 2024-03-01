@@ -13,5 +13,5 @@ public interface UserService {
 
     public User updateUser(User user) throws UsersNotExistException;
 
-    public boolean isUserExist(String username) throws UsersNotExistException;
+    public boolean isUserExist(String username);
 }
