@@ -1,5 +1,6 @@
 package ch.shkermit.tpi.chatapp.model;
 
+import java.util.Date;
 import java.util.UUID;
 
 import jakarta.persistence.Column;
@@ -26,4 +27,7 @@ public class UserSession {
     @ManyToOne
     @JoinColumn(nullable = false)
     private User userInSession;
+
+    @Column(nullable = false)
+    private Date createdAt = new Date();
 }

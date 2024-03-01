@@ -1,6 +1,7 @@
 package ch.shkermit.tpi.chatapp.model;
 
 import java.util.Collection;
+import java.util.Date;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
@@ -60,6 +61,9 @@ public class User {
 
     @Column
     private String bannerPicture;
+
+    @Column(nullable = false)
+    private Date createdAt = new Date();
 
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return AuthorityUtils.createAuthorityList("USER");
