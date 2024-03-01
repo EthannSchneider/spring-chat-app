@@ -1,7 +1,7 @@
 spring:
   datasource:
     driver-class-name: org.apache.derby.jdbc.EmbeddedDriver
-    url: "jdbc:derby:${user.home}/.chatapp-db/app;create=true"
+    url: "jdbc:derby:${user.home}/.chatapp-db/test;create=true"
     hikari:
       auto-commit: false
   jpa:
@@ -9,7 +9,3 @@ spring:
       ddl-auto: update
   flyway:
     enabled: false
-
-server:
-  error:
-    include-stacktrace: never
