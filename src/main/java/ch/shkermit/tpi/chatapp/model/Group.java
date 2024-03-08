@@ -1,11 +1,13 @@
 package ch.shkermit.tpi.chatapp.model;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -35,11 +37,11 @@ public class Group {
     @Column(nullable = false)
     private String description;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "group_has_members",
             joinColumns = @JoinColumn(name = "group_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id"))
-    private List<User> members;
+    private List<User> members = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(nullable = false)
