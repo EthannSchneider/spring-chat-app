@@ -15,19 +15,25 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import ch.shkermit.tpi.chatapp.dto.GroupDTO;
+import ch.shkermit.tpi.chatapp.dto.MessageDTO;
 import ch.shkermit.tpi.chatapp.exception.GroupException.GroupAlreadyExistException;
 import ch.shkermit.tpi.chatapp.exception.GroupException.GroupNotExistException;
 import ch.shkermit.tpi.chatapp.exception.GroupException.GroupOwnerCannotBeRemovedFromTheGroupException;
 import ch.shkermit.tpi.chatapp.exception.GroupException.OnlyGroupOwnerCanRemoveMembersException;
 import ch.shkermit.tpi.chatapp.exception.UsersException.UsersNotExistException;
 import ch.shkermit.tpi.chatapp.model.Group;
+import ch.shkermit.tpi.chatapp.model.GroupContainsMessage;
 import ch.shkermit.tpi.chatapp.model.User;
 import ch.shkermit.tpi.chatapp.model.UserSession;
+import ch.shkermit.tpi.chatapp.projection.GroupMessageProjection;
 import ch.shkermit.tpi.chatapp.projection.GroupProjection;
+import ch.shkermit.tpi.chatapp.projection.OtherUserProjection;
 import ch.shkermit.tpi.chatapp.service.GroupService;
+import ch.shkermit.tpi.chatapp.service.MessageService;
 import ch.shkermit.tpi.chatapp.service.UserService;
 import jakarta.validation.Valid;
 
@@ -39,6 +45,9 @@ public class GroupController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired 
+    private MessageService messageService;
 
     @Autowired
     private ProjectionFactory projectionFactory;
@@ -76,9 +85,7 @@ public class GroupController {
         User user = userService.getUser(username);
         Group group = groupService.getGroup(groupId);
 
-        if(!group.getMembers().contains(userSession.getUserInSession()) && !group.getOwner().equals(userSession.getUserInSession())) {
-            throw new GroupNotExistException();
-        }
+        ifUserInGroupOrThrowGroupNotExistException(userSession, group);
 
         if(!group.getMembers().contains(user)) {
             group.getMembers().add(user);
@@ -113,9 +120,7 @@ public class GroupController {
     public ResponseEntity<String> leaveGroup(@AuthenticationPrincipal UserSession userSession, @PathVariable String groupId) throws GroupNotExistException, GroupOwnerCannotBeRemovedFromTheGroupException, UsersNotExistException {
         Group group = groupService.getGroup(groupId);
 
-        if(!group.getMembers().contains(userSession.getUserInSession()) && !group.getOwner().equals(userSession.getUserInSession())) {
-            throw new GroupNotExistException();
-        }
+        ifUserInGroupOrThrowGroupNotExistException(userSession, group);
 
         if(group.getOwner().equals(userSession.getUserInSession())) {
             if (group.getMembers().size() == 0) {
@@ -131,6 +136,43 @@ public class GroupController {
         return ResponseEntity.status(HttpStatus.OK).body("{\"message\": \"You have left the group.\"}");
     }
 
+    @SuppressWarnings("null")
+    @PostMapping("/{groupId}/message")
+    public GroupMessageProjection sendMessageInGroup(@AuthenticationPrincipal UserSession userSession, @PathVariable String groupId, @RequestBody MessageDTO messageDTO) throws GroupNotExistException, UsersNotExistException {
+        Group group = groupService.getGroup(groupId);
+
+        GroupContainsMessage message = messageService.sendMessageInGroup(messageDTO.getContent(), userSession.getUserInSession(), group);
+
+        return new GroupMessageProjection(
+            message.getMessage().getMessageUUID(), 
+            message.getMessage().getContent(), 
+            projectionFactory.createProjection(OtherUserProjection.class, message.getSender()),
+            projectionFactory.createProjection(GroupProjection.class, message.getGroup()), 
+            message.getMessage().getSendedAt()
+        );
+    }
+
+    @SuppressWarnings("null")
+    @GetMapping("/{groupId}/messages")
+    public List<GroupMessageProjection> getMessagesInGroup(@AuthenticationPrincipal UserSession userSession, @PathVariable String groupId, @RequestParam(required = false) Integer page) throws GroupNotExistException {
+        Group group = groupService.getGroup(groupId);
+
+        ifUserInGroupOrThrowGroupNotExistException(userSession, group);
+
+        if(page == null) page = 0;
+
+        return messageService.getMessagesFromGroup(group, page)
+            .stream()
+            .map(message -> new GroupMessageProjection(
+                message.getMessage().getMessageUUID(), 
+                message.getMessage().getContent(), 
+                projectionFactory.createProjection(OtherUserProjection.class, message.getSender()),
+                projectionFactory.createProjection(GroupProjection.class, message.getGroup()), 
+                message.getMessage().getSendedAt()
+            ))
+            .toList();
+    }
+
     private List<User> convertUsernamesToUsers(List<String> usernames) throws UsersNotExistException {
         List<User> users = new ArrayList<User>();
         for (String username : usernames) {
@@ -138,5 +180,11 @@ public class GroupController {
             users.add(user);
         }
         return users;
+    }
+
+    private void ifUserInGroupOrThrowGroupNotExistException(UserSession userSession, Group group) throws GroupNotExistException {
+        if(!group.getMembers().contains(userSession.getUserInSession()) && !group.getOwner().equals(userSession.getUserInSession())) {
+            throw new GroupNotExistException();
+        }
     }
 }

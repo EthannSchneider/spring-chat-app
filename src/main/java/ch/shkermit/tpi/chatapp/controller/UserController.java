@@ -1,17 +1,23 @@
 package ch.shkermit.tpi.chatapp.controller;
 
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import ch.shkermit.tpi.chatapp.dto.MessageDTO;
 import ch.shkermit.tpi.chatapp.dto.UpdateUserDTO;
 import ch.shkermit.tpi.chatapp.exception.UsersException.UsersAlreadyExistException;
 import ch.shkermit.tpi.chatapp.exception.UsersException.UsersNotExistException;
 import ch.shkermit.tpi.chatapp.model.User;
+import ch.shkermit.tpi.chatapp.model.UserSendMessageToUser;
 import ch.shkermit.tpi.chatapp.model.UserSession;
 import ch.shkermit.tpi.chatapp.projection.OtherUserProjection;
 import ch.shkermit.tpi.chatapp.projection.UserProjection;
+import ch.shkermit.tpi.chatapp.projection.UserToUserMessageProjection;
+import ch.shkermit.tpi.chatapp.service.MessageService;
 import ch.shkermit.tpi.chatapp.service.UserService;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +25,7 @@ import org.springframework.data.projection.ProjectionFactory;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -31,6 +38,9 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired 
+    private MessageService messageService;
     
     @GetMapping
     public UserProjection getUser(@AuthenticationPrincipal UserSession userSession) throws UsersNotExistException {
@@ -55,5 +65,46 @@ public class UserController {
         Optional.ofNullable(userUpdatedDTO.getPronouns()).ifPresent(user::setPronouns);
 
         return projectionFactory.createProjection(UserProjection.class, userService.updateUser(user));
+    }
+
+    @PostMapping("{username}/message")
+    public UserToUserMessageProjection sendMessage(@AuthenticationPrincipal UserSession userSession, @PathVariable String username, @RequestBody MessageDTO messageDTO) throws UsersNotExistException {
+        User receiver = userService.getUser(username);
+
+        isUserSessionNotReceiverOrThrowException(userSession, receiver);
+ 
+        UserSendMessageToUser message = messageService.sendMessageToUser(messageDTO.getContent(), userSession.getUserInSession(), receiver);
+
+        return new UserToUserMessageProjection(
+            message.getMessage().getMessageUUID(), 
+            message.getMessage().getContent(), 
+            projectionFactory.createProjection(OtherUserProjection.class, message.getSender()), 
+            projectionFactory.createProjection(OtherUserProjection.class, message.getReceiver()),
+            message.getMessage().getSendedAt()
+        );
+    }
+
+    @GetMapping("{username}/messages")
+    public List<UserToUserMessageProjection> getMessages(@AuthenticationPrincipal UserSession userSession, @PathVariable String username, @RequestParam(required = false) Integer page) throws UsersNotExistException {
+        User receiver = userService.getUser(username);
+
+        isUserSessionNotReceiverOrThrowException(userSession, receiver);
+
+        if(page == null) page = 0;
+
+        return messageService.getMessagesFromSenderAndReceiver(userSession.getUserInSession(), receiver, page)
+            .stream()
+            .map(message -> new UserToUserMessageProjection(
+                message.getMessage().getMessageUUID(), 
+                message.getMessage().getContent(), 
+                projectionFactory.createProjection(OtherUserProjection.class, message.getSender()), 
+                projectionFactory.createProjection(OtherUserProjection.class, message.getReceiver()),
+                message.getMessage().getSendedAt()
+            ))
+            .toList();
+    }
+
+    private void isUserSessionNotReceiverOrThrowException(UserSession userSession, User user) throws UsersNotExistException {
+        if (userSession.getUserInSession().equals(user)) throw new UsersNotExistException();
     }
 }
