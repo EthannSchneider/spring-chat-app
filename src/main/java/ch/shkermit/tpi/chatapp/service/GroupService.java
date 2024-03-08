@@ -18,4 +18,6 @@ public interface GroupService {
     public Group updateGroup(Group group) throws GroupNotExistException, UsersNotExistException;
 
     public Group deleteGroup(Group group) throws GroupNotExistException;
+
+    public boolean isGroupExist(String groupUUID) throws GroupNotExistException;
 }

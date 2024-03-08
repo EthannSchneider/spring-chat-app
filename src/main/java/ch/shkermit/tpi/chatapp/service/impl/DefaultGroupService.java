@@ -73,6 +73,11 @@ public class DefaultGroupService implements GroupService {
         return group;
     }
 
+    @Override
+    public boolean isGroupExist(String groupUUID) {
+        return groupRepository.findByGroupUUID(groupUUID).isPresent();
+    }
+
     private void checkUserExistence(Group group) throws UsersNotExistException {
         for(User user : group.getMembers()) {
             if (!userService.isUserExist(user.getUsername())) {
