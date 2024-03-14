@@ -14,6 +14,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
@@ -22,6 +23,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @Entity
 @Table(name = "user_identity")
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class User {
     @Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -29,9 +31,11 @@ public class User {
 	private Long id;
 
     @Column(unique = true, nullable = false)
+    @EqualsAndHashCode.Include
     private String username;
 
     @Column(unique = true, nullable = false)
+    @EqualsAndHashCode.Include
     private String email;
 
     @Column(nullable = false, length = 100)
