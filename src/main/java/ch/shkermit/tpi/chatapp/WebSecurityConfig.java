@@ -17,6 +17,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import ch.shkermit.tpi.chatapp.security.CustomAuthenticationManager;
 import ch.shkermit.tpi.chatapp.security.CustomBearerTokenResolver;
 import ch.shkermit.tpi.chatapp.security.CustomJwtDecoder;
+import java.lang.Exception;
 
 @Configuration
 @EnableWebSecurity
@@ -53,8 +54,8 @@ public class WebSecurityConfig {
                         .authorizeHttpRequests(authorizeRequest ->
                                 authorizeRequest
                                 .requestMatchers("/api/auth/login", "/api/auth/register", "/error").permitAll()
-                                .anyRequest().hasAuthority("USER")
-                        )
+                                .requestMatchers("/api/**").hasAuthority("USER")
+                                .anyRequest().permitAll())
                         .oauth2ResourceServer(
                                 oauth2 -> oauth2.bearerTokenResolver(bearerTokenResolver()).jwt(jwt -> jwt.decoder(jwtDecoder()))
                         );
