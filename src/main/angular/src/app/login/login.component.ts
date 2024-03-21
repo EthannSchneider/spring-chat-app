@@ -3,7 +3,6 @@ import { FormControl, UntypedFormGroup } from '@angular/forms';
 import { AuthService } from '../core/service/auth.service';
 import { LoginRequestForm } from '../core/dto/login-request-form';
 import { TokenService } from '../core/service/token.service';
-import { timeInterval, timeout } from 'rxjs';
 
 @Component({
   selector: 'app-login',
@@ -11,19 +10,27 @@ import { timeInterval, timeout } from 'rxjs';
   styleUrls: ['./login.component.scss']
 })
 export class LoginComponent {
-  loginErrorMessages: string = ''
-  loginForm: UntypedFormGroup = new UntypedFormGroup({
-    username: new FormControl(''),
-    password: new FormControl(''),
-  });
+  listFormRegister: string[][] = [
+    ['text', 'username'],
+    ['password', 'password'],
+  ];
+  login = (value: any) =>{
+    this.onSubmit(value);
+  };
+  moreButtonLogin: string[][] = [
+    ['/register', 'Register']
+  ];
+
+  loginErrorMessages: string = "";
 
   constructor(private authService: AuthService, private tokenService: TokenService) {
     
   }
-
-  onSubmit() {
+ 
+  onSubmit(value: any) {
+    console.log(value);
     this.tokenService.logout();
-    this.authService.login(new LoginRequestForm(this.loginForm.value.username, this.loginForm.value.password)).subscribe({
+    this.authService.login(new LoginRequestForm(value.username, value.password)).subscribe({
       next: token => {
         const body = token as { [key: string]: string };
         this.tokenService.setToken(body['token']);

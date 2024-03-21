@@ -23,4 +23,71 @@ export class UserService {
       { headers: headers, responseType: 'json' }
     );
   }
+
+  getUserByUsername(username: string) {
+    const headers = new HttpHeaders().set('Authorization', this.tokenService.getToken());
+    return this.http.get(
+      `/api/user/${username}`,
+      { headers: headers, responseType: 'json' }
+    );
+  }
+
+  getFriendList() {
+    const headers = new HttpHeaders().set('Authorization', this.tokenService.getToken());
+    return this.http.get(
+      '/api/user/friends',
+      { headers: headers, responseType: 'json' }
+    );
+  }
+
+  getPendingRequestFriendList() {
+    const headers = new HttpHeaders().set('Authorization', this.tokenService.getToken());
+    return this.http.get(
+      '/api/user/friends/requests',
+      { headers: headers, responseType: 'json' }
+    );
+  }
+
+  getSentPendingRequestFriendList() {
+    const headers = new HttpHeaders().set('Authorization', this.tokenService.getToken());
+    return this.http.get(
+      '/api/user/friends/requests/sent',
+      { headers: headers, responseType: 'json' }
+    );
+  }
+
+  addFriend(username: string) {
+    const headers = new HttpHeaders().set('Authorization', this.tokenService.getToken());
+    return this.http.post(
+      `/api/user/${username}/friends`,
+      null,
+      { headers: headers, responseType: 'json' }
+    );
+  }
+
+  acceptFriend(username: string) {
+    const headers = new HttpHeaders().set('Authorization', this.tokenService.getToken());
+    return this.http.post(
+      `/api/user/${username}/friends/accept`,
+      null,
+      { headers: headers, responseType: 'json' }
+    );
+  }
+
+  declineFriend(username: string) {
+    const headers = new HttpHeaders().set('Authorization', this.tokenService.getToken());
+    return this.http.post(
+      `/api/user/${username}/friends/decline`,
+      null,
+      { headers: headers, responseType: 'json' }
+    );
+  }
+
+  removeFriend(username: string) {
+    const headers = new HttpHeaders().set('Authorization', this.tokenService.getToken());
+    return this.http.delete(
+      `/api/user/${username}/friends/remove`,
+      { headers: headers, responseType: 'json' }
+    );
+  }
 }
