@@ -6,7 +6,7 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class FriendProjection {
-    private UserProjection user;
+    private OtherUserProjection user;
 
     private String status;
 }

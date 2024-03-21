@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.projection.ProjectionFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,7 +21,7 @@ import ch.shkermit.tpi.chatapp.model.Friendships;
 import ch.shkermit.tpi.chatapp.model.User;
 import ch.shkermit.tpi.chatapp.model.UserSession;
 import ch.shkermit.tpi.chatapp.projection.FriendProjection;
-import ch.shkermit.tpi.chatapp.projection.UserProjection;
+import ch.shkermit.tpi.chatapp.projection.OtherUserProjection;
 import ch.shkermit.tpi.chatapp.service.FriendshipService;
 import ch.shkermit.tpi.chatapp.service.UserService;
 
@@ -79,7 +80,7 @@ public class FriendController {
         return "{\"message\": \"Friend request declined\"}";
     }
 
-    @GetMapping("{username}/friends/remove")
+    @DeleteMapping("{username}/friends/remove")
     public String removeFriend(@AuthenticationPrincipal UserSession userSession, @PathVariable String username) throws UsersNotExistException, FriendshipNotExistException {
         User current_user = userSession.getUserInSession();
         User new_friend = userService.getUser(username);
@@ -101,6 +102,6 @@ public class FriendController {
     @SuppressWarnings("null")
     private FriendProjection getFriendProjection(Friendships friendships, User currentUser) {
         User user = friendships.getRequester().equals(currentUser) ? friendships.getRequested() : friendships.getRequester();
-        return new FriendProjection(projectionFactory.createProjection(UserProjection.class, user), friendships.getStatus().toString());
+        return new FriendProjection(projectionFactory.createProjection(OtherUserProjection.class, user), friendships.getStatus().toString());
     }
 }
