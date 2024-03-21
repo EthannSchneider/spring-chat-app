@@ -67,18 +67,16 @@ export class UserService {
 
   acceptFriend(username: string) {
     const headers = new HttpHeaders().set('Authorization', this.tokenService.getToken());
-    return this.http.post(
+    return this.http.get(
       `/api/user/${username}/friends/accept`,
-      null,
       { headers: headers, responseType: 'json' }
     );
   }
 
   declineFriend(username: string) {
     const headers = new HttpHeaders().set('Authorization', this.tokenService.getToken());
-    return this.http.post(
+    return this.http.get(
       `/api/user/${username}/friends/decline`,
-      null,
       { headers: headers, responseType: 'json' }
     );
   }

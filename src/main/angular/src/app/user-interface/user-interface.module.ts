@@ -12,11 +12,13 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import {MatCheckboxModule} from '@angular/material/checkbox';
 import {MatDialogModule} from '@angular/material/dialog';
 import {MatSelectModule} from '@angular/material/select';
+import { FriendsComponent } from './friends/friends.component';
 
 @NgModule({
   declarations: [
     UserInterfaceComponent,
     DashboardComponent,
+    FriendsComponent
   ],
   imports: [
     DashboardRoutingModule,

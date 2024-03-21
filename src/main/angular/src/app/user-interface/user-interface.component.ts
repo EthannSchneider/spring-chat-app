@@ -21,7 +21,7 @@ export class UserInterfaceComponent implements OnInit {
         next: user => {
           const body = user as { [key: string]: string };
           this.username = body["username"] ?? '';
-          this.name = body["name"] ?? '';
+          this.name = body["firstName"] ?? '';
           this.lastname = body["lastName"] ?? '';
         },
         error: err => {
