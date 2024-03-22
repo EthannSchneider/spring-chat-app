@@ -1,4 +1,8 @@
 <div class="center friends">
+    <div class="addfriends">
+        <input type="text" (keypress)="addFriends($event)" placeholder="Search for friends">
+        <p class="error">{{addFriendSearchError}}</p>
+    </div>
     <div class="user" *ngFor="let friend of friendRequests"> 
         <img [src]="friend.user.profilePicture" alt="avatar">
         <h2>{{friend.user.username}}</h2>

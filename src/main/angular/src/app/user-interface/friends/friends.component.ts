@@ -10,6 +10,7 @@ export class FriendsComponent implements OnInit{
   friends: any[] = [];
   friendRequests: any[] = [];
   sentFriendRequests: any[] = [];
+  addFriendSearchError: string = '';
 
   constructor(private userService: UserService) { }
 
@@ -43,5 +44,25 @@ export class FriendsComponent implements OnInit{
     this.userService.removeFriend(friend.user.username).subscribe(() => {
       this.ngOnInit();
     });
+  }
+
+  addFriends(event: any) {
+    if (event.key === "Enter") {
+      this.userService.getUserByUsername(event.target.value).subscribe({
+        next: user => {
+          this.userService.addFriend(event.target.value).subscribe({
+            next: friendrequest => {
+              this.addFriendSearchError = '';
+              this.ngOnInit();
+            },
+            error: error => {
+              this.addFriendSearchError = "Already a friends or a request already sent.";
+            }
+          });
+        },
+        error: error => {
+          this.addFriendSearchError = "User not found.";
+        }});
+    }
   }
 }

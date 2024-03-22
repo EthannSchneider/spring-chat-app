@@ -58,9 +58,8 @@ export class UserService {
 
   addFriend(username: string) {
     const headers = new HttpHeaders().set('Authorization', this.tokenService.getToken());
-    return this.http.post(
+    return this.http.get(
       `/api/user/${username}/friends`,
-      null,
       { headers: headers, responseType: 'json' }
     );
   }
