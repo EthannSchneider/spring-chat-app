@@ -1,0 +1,19 @@
+<div class="conversations">
+    <div class="search">
+        <input type="text" [(ngModel)]="search" (keyup.enter)="createConversation()" placeholder="Search">
+        <button (click)="createConversation()">Create</button>
+    </div>
+    <div class="user" *ngFor="let conversation of conversations" routerLink="/user-interface/conversations/{{conversation}}">
+        <div class="info">
+            <img src="{{conversationsUser.get(conversation).profilePicture}}" alt="User">
+            <div class="user-name">
+                <h1>{{conversation}}</h1>
+                <p>{{conversationsLastMessage.get(conversation).content}}</p>
+            </div>
+        </div>
+        <div class="time">
+            <p>{{convertTimestampToDate(conversationsLastMessage.get(conversation).sendedAt)}}</p>
+            <p>{{convertTimestampToTime(conversationsLastMessage.get(conversation).sendedAt)}}</p>
+        </div>
+    </div>
+</div>

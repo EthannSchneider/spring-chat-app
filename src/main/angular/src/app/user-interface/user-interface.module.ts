@@ -13,12 +13,16 @@ import {MatCheckboxModule} from '@angular/material/checkbox';
 import {MatDialogModule} from '@angular/material/dialog';
 import {MatSelectModule} from '@angular/material/select';
 import { FriendsComponent } from './friends/friends.component';
+import { ConversationsComponent } from './conversations/conversations.component';
+import { UserComponent } from './conversations/user/user.component';
 
 @NgModule({
   declarations: [
     UserInterfaceComponent,
     DashboardComponent,
-    FriendsComponent
+    FriendsComponent,
+    ConversationsComponent,
+    UserComponent
   ],
   imports: [
     DashboardRoutingModule,

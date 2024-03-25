@@ -87,4 +87,21 @@ export class UserService {
       { headers: headers, responseType: 'json' }
     );
   }
+
+  getMessages(username: string, page: number) {
+    const headers = new HttpHeaders().set('Authorization', this.tokenService.getToken());
+    return this.http.get(
+      `/api/user/${username}/messages?page=${page ?? 0}`,
+      { headers: headers, responseType: 'json' }
+    );
+  }
+
+  sendMessage(username: string, message: string) {
+    const headers = new HttpHeaders().set('Authorization', this.tokenService.getToken());
+    return this.http.post(
+      `/api/user/${username}/message`,
+      { content: message },
+      { headers: headers, responseType: 'json' }
+    );
+  }
 }
