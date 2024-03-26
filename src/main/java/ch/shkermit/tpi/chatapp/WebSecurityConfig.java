@@ -53,7 +53,7 @@ public class WebSecurityConfig {
                         .authenticationManager(authenticationManager())
                         .authorizeHttpRequests(authorizeRequest ->
                                 authorizeRequest
-                                .requestMatchers("/api/auth/login", "/api/auth/register", "/error").permitAll()
+                                .requestMatchers("/api/auth/login", "/api/auth/register", "/error", "/api/docs/**").permitAll()
                                 .requestMatchers("/api/**").hasAuthority("USER")
                                 .anyRequest().permitAll())
                         .oauth2ResourceServer(

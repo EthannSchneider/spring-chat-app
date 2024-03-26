@@ -13,3 +13,10 @@ spring:
 server:
   error:
     include-stacktrace: never
+
+springdoc:
+  api-docs:
+    path: /api/docs
+
+  swagger-ui:
+    path: /api/docs/index.html
