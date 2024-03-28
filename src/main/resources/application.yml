@@ -19,4 +19,5 @@ springdoc:
     path: /api/docs
 
   swagger-ui:
-    path: /api/docs/index.html
+    path: /api/docs/ui
+

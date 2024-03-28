@@ -31,14 +31,21 @@ import ch.shkermit.tpi.chatapp.model.User;
 import ch.shkermit.tpi.chatapp.model.UserSession;
 import ch.shkermit.tpi.chatapp.projection.GroupMessageProjection;
 import ch.shkermit.tpi.chatapp.projection.GroupProjection;
+import ch.shkermit.tpi.chatapp.projection.MessageProjection;
 import ch.shkermit.tpi.chatapp.projection.OtherUserProjection;
 import ch.shkermit.tpi.chatapp.service.GroupService;
 import ch.shkermit.tpi.chatapp.service.MessageService;
 import ch.shkermit.tpi.chatapp.service.UserService;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.tags.Tags;
 import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("api/group")
+@Tags({ @Tag(name = "Group", description = "Group Controller API") })
 public class GroupController {
     @Autowired
     private GroupService groupService;
@@ -54,6 +61,10 @@ public class GroupController {
 
     @SuppressWarnings("null")
     @PostMapping
+    @ApiResponses(value = { 
+        @ApiResponse(responseCode = "201", description = "Group created successfully"),
+        @ApiResponse(responseCode = "401", content = @Content)
+    })
     public ResponseEntity<GroupProjection> createGroup(@RequestBody @Valid GroupDTO groupDTO, @AuthenticationPrincipal UserSession userSession) throws UsersNotExistException, GroupAlreadyExistException {
         Group group = new Group();
 
@@ -72,6 +83,10 @@ public class GroupController {
 
     @SuppressWarnings("null")
     @GetMapping
+    @ApiResponses(value = { 
+        @ApiResponse(responseCode = "200"),
+        @ApiResponse(responseCode = "401", content = @Content)
+    })
     public List<GroupProjection> getGroups(@AuthenticationPrincipal UserSession userSession) throws UsersNotExistException {
         return groupService.getGroupsOfUser(userSession.getUserInSession())
             .stream()
@@ -81,6 +96,12 @@ public class GroupController {
 
     @SuppressWarnings("null")
     @GetMapping("/{groupId}/add/{username}")
+    @ApiResponses(value = { 
+        @ApiResponse(responseCode = "200"),
+        @ApiResponse(responseCode = "401", content = @Content),
+        @ApiResponse(responseCode = "404", description = "Group not exist", content = @Content),
+        @ApiResponse(responseCode = "404", description = "User not exist", content = @Content)
+    })
     public GroupProjection addMemberToGroup(@AuthenticationPrincipal UserSession userSession, @PathVariable String username, @PathVariable String groupId) throws UsersNotExistException, GroupNotExistException {
         User user = userService.getUser(username);
         Group group = groupService.getGroup(groupId);
@@ -98,6 +119,12 @@ public class GroupController {
 
     @SuppressWarnings("null")
     @DeleteMapping("/{groupId}/remove/{username}")
+    @ApiResponses(value = { 
+        @ApiResponse(responseCode = "200"),
+        @ApiResponse(responseCode = "401", content = @Content),
+        @ApiResponse(responseCode = "404", description = "Group not exist", content = @Content),
+        @ApiResponse(responseCode = "404", description = "User not exist", content = @Content)
+    })
     public GroupProjection removeMemberFromGroup(@AuthenticationPrincipal UserSession userSession, @PathVariable String username, @PathVariable String groupId) throws UsersNotExistException, GroupNotExistException, OnlyGroupOwnerCanRemoveMembersException, GroupOwnerCannotBeRemovedFromTheGroupException {
         User user = userService.getUser(username);
         Group group = groupService.getGroup(groupId);
@@ -117,7 +144,12 @@ public class GroupController {
     }
 
     @GetMapping("/{groupId}/leave")
-    public ResponseEntity<String> leaveGroup(@AuthenticationPrincipal UserSession userSession, @PathVariable String groupId) throws GroupNotExistException, GroupOwnerCannotBeRemovedFromTheGroupException, UsersNotExistException {
+    @ApiResponses(value = { 
+        @ApiResponse(responseCode = "200"),
+        @ApiResponse(responseCode = "401", content = @Content),
+        @ApiResponse(responseCode = "404", description = "Group not exist", content = @Content),
+    })
+    public ResponseEntity<MessageProjection> leaveGroup(@AuthenticationPrincipal UserSession userSession, @PathVariable String groupId) throws GroupNotExistException, GroupOwnerCannotBeRemovedFromTheGroupException, UsersNotExistException {
         Group group = groupService.getGroup(groupId);
 
         ifUserInGroupOrThrowGroupNotExistException(userSession, group);
@@ -125,7 +157,7 @@ public class GroupController {
         if(group.getOwner().equals(userSession.getUserInSession())) {
             if (group.getMembers().size() == 0) {
                 groupService.deleteGroup(group);
-                return ResponseEntity.status(HttpStatus.OK).body("{\"message\": \"You have left the group and the group has been deleted.\"}");
+                return ResponseEntity.ok(new MessageProjection("You have left the group and the group has been deleted."));
             }
             group.setOwner(group.getMembers().remove(0));
         }else {
@@ -133,11 +165,16 @@ public class GroupController {
         }
         groupService.updateGroup(group);
 
-        return ResponseEntity.status(HttpStatus.OK).body("{\"message\": \"You have left the group.\"}");
+        return ResponseEntity.ok(new MessageProjection("You have left the group."));
     }
 
     @SuppressWarnings("null")
     @PostMapping("/{groupId}/message")
+    @ApiResponses(value = { 
+        @ApiResponse(responseCode = "200"),
+        @ApiResponse(responseCode = "401", content = @Content),
+        @ApiResponse(responseCode = "404", description = "Group not exist", content = @Content),
+    })
     public GroupMessageProjection sendMessageInGroup(@AuthenticationPrincipal UserSession userSession, @PathVariable String groupId, @RequestBody MessageDTO messageDTO) throws GroupNotExistException, UsersNotExistException {
         Group group = groupService.getGroup(groupId);
 
@@ -154,6 +191,11 @@ public class GroupController {
 
     @SuppressWarnings("null")
     @GetMapping("/{groupId}/messages")
+    @ApiResponses(value = { 
+        @ApiResponse(responseCode = "200"),
+        @ApiResponse(responseCode = "401", content = @Content),
+        @ApiResponse(responseCode = "404", description = "Group not exist", content = @Content),
+    })
     public List<GroupMessageProjection> getMessagesInGroup(@AuthenticationPrincipal UserSession userSession, @PathVariable String groupId, @RequestParam(required = false) Integer page) throws GroupNotExistException {
         Group group = groupService.getGroup(groupId);
 
