@@ -1,0 +1,11 @@
+@import '../../core/scss/color.scss';
+
+.dashboard {
+    z-index: 1;
+    width: 60%;
+    height: 50%;
+    background-color: $forground_color;
+    padding: 10px;
+    border: 3px solid;
+    border-radius:40px;
+}

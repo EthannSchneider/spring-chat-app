@@ -1,0 +1,54 @@
+@import '../core/scss/color.scss';
+
+nav#Menu{
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0;
+    right: 0;
+    left: 0;
+    background: $forground_color;
+    padding: 17px 0px 17px 0px;
+    border-bottom: 2px solid #000000;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    z-index: 2;
+
+    > ul.menu {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        width: 50%;
+        @media (max-width: 748px) {
+            flex-direction: column;
+        }
+        > li {
+            list-style-type: none;  
+            > a {
+                color: black;
+                text-decoration: none;
+                font-size: 35px;
+            }
+        }
+    }
+    > ul.manage {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        > li {
+            list-style-type: none;
+            > p {
+                font-size: 12px;
+            }
+            > button {
+                background: none;
+                border: none;
+                color: black;
+                font-size: 12.5px;
+                cursor: pointer;
+                text-decoration: underline;
+            }
+        }
+    }
+}

@@ -5,8 +5,6 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class FriendProjection {
-    private OtherUserProjection user;
-
-    private String status;
+public class MessageProjection {
+    private String message;
 }

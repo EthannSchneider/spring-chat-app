@@ -1,0 +1,27 @@
+<nav id="Menu">
+    <a href="/">
+        
+        <img src="/favicon.ico" alt="logo" style="float: left;" width="70" height="70"/>
+    </a>
+    <ul class="menu">
+        <li>
+            <a routerLink="/user-interface/dashboard">Dashboard</a>
+        </li>
+        <li>
+            <a routerLink="/user-interface/friends">Friends</a>
+        </li>
+        <li>
+            <a routerLink="/user-interface/conversations">Conversations</a>
+        </li>
+    </ul>
+    <ul class="manage">
+        <li>
+            <span>{{username}}</span>
+            <p>{{name}} {{lastname}}</p>
+        </li>
+        <li>
+            <button (click)="logout()">logout</button> 
+        </li>
+    </ul>
+</nav>
+<router-outlet></router-outlet>

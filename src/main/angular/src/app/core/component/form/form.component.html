@@ -1,0 +1,16 @@
+<div class="background">
+    <div class="forms">
+        <h1>{{title}}</h1>
+        <form [formGroup]="forms" (ngSubmit)="onSubmit()">
+            <div class="error">
+                {{errorMessages}}
+            </div>
+            <div class="field" *ngFor="let form of listForm">
+                <label for="{{form[1]}}">{{form[1].replaceAll("_", " ")}}</label>
+                <input type="{{form[0]}}" id="{{form[1]}}" formControlName="{{form[1]}}">
+            </div>
+            <button type="submit" [disabled]="!forms.valid">{{title}}</button>
+            <button *ngFor="let button of moreButton" type="button" (click)="redirect(button[0])">{{button[1]}}</button>
+        </form>
+    </div>
+</div>

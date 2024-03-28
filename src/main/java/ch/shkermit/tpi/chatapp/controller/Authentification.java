@@ -10,10 +10,16 @@ import ch.shkermit.tpi.chatapp.exception.UsersException.UsersAlreadyExistExcepti
 import ch.shkermit.tpi.chatapp.exception.UsersException.UsersNotExistException;
 import ch.shkermit.tpi.chatapp.model.User;
 import ch.shkermit.tpi.chatapp.model.UserSession;
+import ch.shkermit.tpi.chatapp.projection.MessageProjection;
 import ch.shkermit.tpi.chatapp.projection.TokenUserProjection;
 import ch.shkermit.tpi.chatapp.projection.UserProjection;
 import ch.shkermit.tpi.chatapp.service.UserService;
 import ch.shkermit.tpi.chatapp.service.UserSessionService;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.tags.Tags;
 import jakarta.validation.Valid;
 
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,6 +34,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 @RestController
 @RequestMapping("api/auth")
+@Tags({ @Tag(name = "Authentification", description = "Authentification API") })
 public class Authentification {
     @Autowired
     private UserService userService;
@@ -39,6 +46,10 @@ public class Authentification {
     private ProjectionFactory projectionFactory;
 
     @PostMapping("login")
+    @ApiResponses(value = { 
+        @ApiResponse(responseCode = "200", description = "User logged in"),
+        @ApiResponse(responseCode = "404", description = "User not exist", content = @Content),
+    })
     public ResponseEntity<TokenUserProjection> login(@RequestBody @Valid LoginUserDTO userDTO) throws UsersNotExistException {
         User user = userService.getUser(userDTO.getUsername(), userDTO.getPassword());
 
@@ -46,6 +57,10 @@ public class Authentification {
     }
 
     @PostMapping("register")
+    @ApiResponses(value = { 
+        @ApiResponse(responseCode = "201", description = "User created"),
+        @ApiResponse(responseCode = "400", description = "User already exists", content = @Content)
+    })
     public ResponseEntity<TokenUserProjection> register(@RequestBody @Valid RegisterUserDTO userDTO) throws UsersAlreadyExistException {
         User newUser = new User();
         newUser.setUsername(userDTO.getUsername());
@@ -61,10 +76,14 @@ public class Authentification {
     }
 
     @GetMapping("logout")
-    public ResponseEntity<String> logout(@AuthenticationPrincipal UserSession userSession) throws SessionNotExistException {
+    @ApiResponses(value = { 
+        @ApiResponse(responseCode = "200", description = "User logged out"),
+        @ApiResponse(responseCode = "401", content = @Content)
+    })
+    public ResponseEntity<MessageProjection> logout(@AuthenticationPrincipal UserSession userSession) throws SessionNotExistException {
         userSessionService.deleteSession(userSession);
 
-        return ResponseEntity.ok().body("{\"message\": \"User logged out\"}");
+        return ResponseEntity.ok().body(new MessageProjection("User logged out"));
     }
 
     @SuppressWarnings("null")

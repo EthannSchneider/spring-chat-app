@@ -1,0 +1,27 @@
+<div class="center friends">
+    <div class="addfriends">
+        <input type="text" (keypress)="addFriends($event)" placeholder="Search for friends">
+        <p class="error">{{addFriendSearchError}}</p>
+    </div>
+    <div class="user" *ngFor="let friend of friendRequests"> 
+        <img [src]="friend.user.profilePicture" alt="avatar">
+        <h2>{{friend.user.username}}</h2>
+        <div>
+            <button (click)="acceptFriendRequest(friend)">Accept</button>
+            <button (click)="rejectFriendRequest(friend)">Reject</button>
+        </div>
+    </div>
+    <div class="user" *ngFor="let friend of friends"> 
+        <img [src]="friend.user.profilePicture" alt="avatar">
+        <h2>{{friend.user.username}}</h2>
+        <p>{{friend.status}}</p>
+        <button (click)="removeFriend(friend)">❌</button>
+    </div>
+    <div class="user" *ngFor="let friend of sentFriendRequests"> 
+        <img [src]="friend.user.profilePicture" alt="avatar">
+        <h2>{{friend.user.username}}</h2>
+        <p>{{friend.status}}</p>
+        <button (click)="removeFriend(friend)">❌</button>
+    </div>
+
+</div>

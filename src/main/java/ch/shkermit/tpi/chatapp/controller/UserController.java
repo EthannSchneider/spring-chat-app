@@ -16,6 +16,11 @@ import ch.shkermit.tpi.chatapp.projection.UserProjection;
 import ch.shkermit.tpi.chatapp.projection.UserToUserMessageProjection;
 import ch.shkermit.tpi.chatapp.service.MessageService;
 import ch.shkermit.tpi.chatapp.service.UserService;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.tags.Tags;
 
 import java.util.List;
 import java.util.Optional;
@@ -32,6 +37,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 @SuppressWarnings("null")
 @RestController
 @RequestMapping("api/user")
+@Tags({ @Tag(name = "User", description = "User Controller API") })
 public class UserController {
     @Autowired 
     private ProjectionFactory projectionFactory;
@@ -43,16 +49,29 @@ public class UserController {
     private MessageService messageService;
     
     @GetMapping
+    @ApiResponses(value = { 
+        @ApiResponse(responseCode = "200"),
+        @ApiResponse(responseCode = "401", content = @Content),
+    })
     public UserProjection getUser(@AuthenticationPrincipal UserSession userSession) throws UsersNotExistException {
         return projectionFactory.createProjection(UserProjection.class, userSession.getUserInSession());
     }
 
     @GetMapping("{username}")
+    @ApiResponses(value = { 
+        @ApiResponse(responseCode = "200"),
+        @ApiResponse(responseCode = "401", content = @Content),
+        @ApiResponse(responseCode = "404", description = "User not found", content = @Content),
+    })
     public OtherUserProjection getUserByUsername(@PathVariable String username) throws UsersNotExistException {
         return projectionFactory.createProjection(OtherUserProjection.class, userService.getUser(username));
     }
 
     @PutMapping
+    @ApiResponses(value = { 
+        @ApiResponse(responseCode = "200"),
+        @ApiResponse(responseCode = "401", content = @Content),
+    })
     public UserProjection updateUser(@AuthenticationPrincipal UserSession userSession, @RequestBody UpdateUserDTO userUpdatedDTO) throws UsersNotExistException, UsersAlreadyExistException {
         User user = userSession.getUserInSession();
 
@@ -68,6 +87,11 @@ public class UserController {
     }
 
     @PostMapping("{username}/message")
+    @ApiResponses(value = { 
+        @ApiResponse(responseCode = "200"),
+        @ApiResponse(responseCode = "401", content = @Content),
+        @ApiResponse(responseCode = "404", description = "User not found", content = @Content),
+    })
     public UserToUserMessageProjection sendMessage(@AuthenticationPrincipal UserSession userSession, @PathVariable String username, @RequestBody MessageDTO messageDTO) throws UsersNotExistException {
         User receiver = userService.getUser(username);
 
@@ -85,6 +109,11 @@ public class UserController {
     }
 
     @GetMapping("{username}/messages")
+    @ApiResponses(value = { 
+        @ApiResponse(responseCode = "200"),
+        @ApiResponse(responseCode = "401", content = @Content),
+        @ApiResponse(responseCode = "404", description = "User not found", content = @Content),
+    })
     public List<UserToUserMessageProjection> getMessages(@AuthenticationPrincipal UserSession userSession, @PathVariable String username, @RequestParam(required = false) Integer page) throws UsersNotExistException {
         User receiver = userService.getUser(username);
 
